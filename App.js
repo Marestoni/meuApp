@@ -17,12 +17,24 @@ export default function meuApp() {
 
   useEffect(()=>{
     async function Dados(){
+        //criar um nó
+        //await firebase.database().ref('tipo').set('Cliente');
+        //Remover um nó da base
+        //await firebase.database().ref('tipo').remove();
+
+        //adicionando mais um filho dentro de um nó
+        /*await firebase.database().ref('usuario').child(3).set({
+          nome: 'José',
+          cargo: 'Programador junior'
+        })*/
+        //Atulizar um filho
+        /*await firebase.database().ref('usuario').child(3).update({
+          nome:'Jézin'
+        });*/
 
 
 
 
-
-      
       /*o .on é o olheiro, ele fica verificando a todo momento a database
       await firebase.database().ref('usuario/1').on('value' , (snapshot) =>{
         setNome(snapshot.val().nome);
