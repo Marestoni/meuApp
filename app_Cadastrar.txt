@@ -13,35 +13,32 @@ export default function meuApp() {
 
   //constante useState/varivel de estado
   const [email, setEmail] = useState('');
-  const [nome, setNome] = useState('');
   const [password, setPassword] = useState('');
   
-  
   async function cadastrar(){
-    await firebase.auth().createUserWithEmailAndPassword(email, password)
-    .then((value)=>{
-        
-        firebase.database().ref('usuario').child(value.user.uid).set({
-          nome:nome
-        })
-        alert('Usuario criado')
-        setEmail('')
-        setNome('')
-        setPassword('')
-    })
-    .catch((error)=>{
-      alert('algo deu errado')
-    })
+   await firebase.auth().createUserWithEmailAndPassword(email, password)
+   .then((value)=> {
+     alert('Criado ' + value.user.email);
+   })
+   .catch((error)=> {
+     if(error.code === 'auth/weak-password'){
+       alert('Sua senha deve ter pelo menos 6 caracteres');
+       return;
+     }
+     if(error.code === 'auth/invalid-email'){
+       alert('Email invalido');
+       return;
+     }else{
+       alert('Algo deu errado, tente novamente');
+       return;
+     }
+   })
+   setEmail('');
+   setPassword('');
   }
+
  return (
    <View style={styles.container}>
-     <TextInput
-      style = {styles.input}
-      underlineColorAndroid="transparent"
-      onChangeText={(texto) => setNome(texto)}
-      value={nome}
-      placeholder= "Nome"
-     />
      <TextInput
       style = {styles.input}
       underlineColorAndroid="transparent"
@@ -62,7 +59,9 @@ export default function meuApp() {
       title="Cadastrar"
       onPress={cadastrar}
      />
-          
+     
+
+     
    </View>
   );
 }
