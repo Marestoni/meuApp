@@ -1,6 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, StyleSheet, Button, TextInput } from 'react-native';
+import { View, Text, StyleSheet, Button, TextInput, FlatList, ActivityIndicator } from 'react-native';
 import firebase from './src/firebaseConnection';
+
+import Listagem from './src/Listagem';
 
 
 
@@ -12,11 +14,30 @@ export default function meuApp() {
   //constante useState/varivel de estado
   const [nome, setNome] = useState('');
   const [cargo, setCargo] = useState('');
+  const [usuario, setUsuario] = useState([]);
+  const [load, setLoad] = useState(true);
 
   
 
   useEffect(()=>{
     async function Dados(){
+        
+      await firebase.database().ref('usuario').on('value', (snapshot)=>{
+        setUsuario([]);
+        snapshot.forEach((chilItem) => {
+          let data ={
+            key: chilItem.key,
+            nome: chilItem.val().nome,
+            cargo: chilItem.val().cargo
+          };
+
+          setUsuario(oldArray => [...oldArray,data].reverse());
+        })
+        setLoad(false);
+      })
+
+
+
         //criar um nó
         //await firebase.database().ref('tipo').set('Cliente');
         //Remover um nó da base
@@ -49,7 +70,7 @@ export default function meuApp() {
 
     Dados();
 
-  },[]);
+  }, []);
 
   async function cadastrar(){
     if(nome !== '' & cargo !== ''){
@@ -61,6 +82,8 @@ export default function meuApp() {
         cargo: cargo
       });
       alert('Castro realizado');
+      setCargo('');
+      setNome('');
     }
   }
 
@@ -71,18 +94,35 @@ export default function meuApp() {
       style = {styles.input}
       underlineColorAndroid="transparent"
       onChangeText={(texto) => setNome(texto)}
+      value={nome}
      />
      <Text style={styles.texto}>Cargo</Text>
      <TextInput
       style = {styles.input}
       underlineColorAndroid="transparent"
       onChangeText={(texto) => setCargo(texto)}
+      value={cargo}
      />
      
      <Button 
       title="Novo Cadastro"
       onPress={cadastrar}
      />
+     
+     {load ?
+     (
+      <ActivityIndicator color="#121212" size={45} />
+     ):
+     (
+      <FlatList 
+      keyExtractor={item => item.key}
+      data={usuario}
+      renderItem={({item})=> (<Listagem data={item} />)}
+     />
+     )
+    }
+
+     
    </View>
   );
 }
